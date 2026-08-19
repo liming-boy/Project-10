@@ -1,0 +1,124 @@
+/*==============================================================================
+ * MODULE: Grid Generation & Algorithmic Engine
+ * AUTHOR: Md. Fahad Kamal Lingkon
+ * DESCRIPTION: Handles 8-directional vector mapping, collision-resistant word 
+ *              placement, Monte Carlo trials, and filler character population.
+ *============================================================================*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* --- Grid & Algorithmic Dimension Constants --- */
+#define GS       15        /* Grid dimension (15 x 15 matrix) */
+#define MAX_W    12        /* Maximum words allowed in puzzle */
+#define MAX_L    14        /* Maximum length per word         */
+#define TRIES   1000       /* Max placement attempts per word */
+#define NDIRS    8         /* 8 Search & Placement Directions */
+
+/* --- 8-Directional Vector Offsets: [Row Delta, Column Delta] --- */
+/*  0: Right (E),       1: Left (W),        2: Down (S),        3: Up (N)
+    4: Down-Right (SE), 5: Down-Left (SW),  6: Up-Right (NE),   7: Up-Left (NW) */
+static const int DR[NDIRS] = {  0,  0,  1, -1,  1,  1, -1, -1 };
+static const int DC[NDIRS] = {  1, -1,  0,  0,  1, -1,  1, -1 };
+static const char *DNAME[NDIRS] = {
+    "Right", "Left", "Down", "Up",
+    "Down-Right", "Down-Left", "Up-Right", "Up-Left"
+};
+
+/* --- Global Matrix State Structures --- */
+static char grid [GS][GS]; /* Letter board (0 = empty, else uppercase char) */
+static int  fmask[GS][GS]; /* Found mask (0 = not found, K = found word ID)  */
+static int  smask[GS][GS]; /* Solution mask (0 = filler, K = placed word ID) */
+
+/* --- Word Metadata Tracking --- */
+static char W      [MAX_W][MAX_L+1]; 
+static int  wRow   [MAX_W];          /* Starting row index */
+static int  wCol   [MAX_W];          /* Starting column index */
+static int  wDir   [MAX_W];          /* Direction index (0-7) */
+static int  wPlaced[MAX_W];          /* 1 = Placed, 0 = Failed */
+static int  wFound [MAX_W];          /* 1 = Found by player */
+static int  nW      = 0;             /* Total words in list */
+static int  nPlaced = 0;             /* Total words placed on grid */
+static int  nFound  = 0;             /* Total words discovered */
+
+/* --- Boundary Validation Helper --- */
+static int inBounds(int r, int c) {
+    return r >= 0 && r < GS && c >= 0 && c < GS;
+}
+
+/* --- State Initialization Routine --- */
+static void resetState(void) {
+    memset(grid,    0, sizeof grid);
+    memset(fmask,   0, sizeof fmask);
+    memset(smask,   0, sizeof smask);
+    memset(wPlaced, 0, sizeof wPlaced);
+    memset(wFound,  0, sizeof wFound);
+    nPlaced = 0;
+    nFound  = 0;
+}
+
+/* --- Collision & Overlap Validation Engine --- */
+static int canPlace(const char *w, int r0, int c0, int d) {
+    int len = (int)strlen(w);
+    for (int i = 0; i < len; i++) {
+        int r = r0 + i * DR[d];
+        int c = c0 + i * DC[d];
+        
+        /* Check 1: Must be within grid bounds */
+        if (!inBounds(r, c)) return 0;
+        
+        /* Check 2: Cell must be empty OR match the intersecting letter */
+        if (grid[r][c] && grid[r][c] != w[i]) return 0; 
+    }
+    return 1;
+}
+
+/* --- Matrix Placement Commit Routine --- */
+static void doPlace(const char *w, int r0, int c0, int d, int id) {
+    int len = (int)strlen(w);
+    for (int i = 0; i < len; i++) {
+        grid [r0 + i * DR[d]][c0 + i * DC[d]] = w[i];
+        smask[r0 + i * DR[d]][c0 + i * DC[d]] = id;
+    }
+}
+
+/* --- Monte Carlo Randomized Placement Algorithm --- */
+static int tryPlaceWord(int idx) {
+    for (int t = 0; t < TRIES; t++) {
+        int d  = rand() % NDIRS;
+        int r0 = rand() % GS;
+        int c0 = rand() % GS;
+        
+        if (canPlace(W[idx], r0, c0, d)) {
+            doPlace(W[idx], r0, c0, d, idx + 1);
+            wRow[idx]    = r0;
+            wCol[idx]    = c0;
+            wDir[idx]    = d;
+            wPlaced[idx] = 1;
+            nPlaced++;
+            return 1;
+        }
+    }
+    return 0; /* Placement failed within TRIES limit */
+}
+
+/* --- Noise / Filler Character Generator --- */
+static void fillRandom(void) {
+    for (int r = 0; r < GS; r++) {
+        for (int c = 0; c < GS; c++) {
+            if (!grid[r][c]) {
+                grid[r][c] = 'A' + rand() % 26;
+            }
+        }
+    }
+}
+
+/* --- Master Pipeline Generator --- */
+static void generatePuzzle(void) {
+    resetState();
+    for (int i = 0; i < nW; i++) {
+        tryPlaceWord(i);
+    }
+    fillRandom();
+}
