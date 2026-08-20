@@ -27,9 +27,9 @@ just the C standard library plus the Windows console API on Windows.
 - **Cross-platform**: the same source compiles and runs on Windows,
   Linux and macOS (conditional compilation handles the differences)
 
-## Compiling & running
+Compiling & running
 
-### Windows (MinGW / Code::Blocks / Dev-C++ / WSL)
+Windows (MinGW / Code::Blocks / Dev-C++ / WSL)
 
 If you have MinGW's `gcc` on your PATH (Code::Blocks and Dev-C++ both
 ship one), open a terminal in this folder and run:
