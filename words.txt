@@ -1,0 +1,21 @@
+# Word Search Generator - sample word list
+# Lines starting with # are comments and are ignored.
+# One word per line, letters only, 2-15 characters.
+# Try loading this from the "New Puzzle" menu (option 1) and
+# compare it against the built-in sample list (option 3)!
+
+ALGORITHM
+DATABASE
+NETWORK
+SOFTWARE
+HARDWARE
+INTERNET
+KEYBOARD
+MONITOR
+PROCESSOR
+BINARY
+COMPILER
+DEBUGGING
+INTERFACE
+PROTOCOL
+ENCRYPTION
