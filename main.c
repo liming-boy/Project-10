@@ -4,6 +4,7 @@
 #include <time.h>
 #include <ctype.h>
 
+/* Part 1 */
 #ifdef _WIN32
 #include <windows.h>
 static HANDLE hCon;
@@ -19,13 +20,9 @@ static void clrscr(void)      { system("clear"); }
 #endif
 
 #define GS       15
-
 #define MAX_W    12
-
 #define MAX_L    14
-
 #define TRIES   1000
-
 #define NDIRS    8
 
 static const int DR[NDIRS] = {  0,  0,  1, -1,  1,  1, -1, -1 };
@@ -40,34 +37,24 @@ static const int PAL[8] = { 10, 14, 11, 13, 12, 9, 2, 6 };
 static char grid [GS][GS];
 static int  fmask[GS][GS];
 static int  smask[GS][GS];
-
 static char W      [MAX_W][MAX_L+1];
 static int  wRow   [MAX_W];
-
 static int  wCol   [MAX_W];
-
 static int  wDir   [MAX_W];
-
 static int  wPlaced[MAX_W];
-
 static int  wFound [MAX_W];
-
 static int  nW      = 0;
-
 static int  nPlaced = 0;
-
 static int  nFound  = 0;
 
-/* Structure for Player Profile & Score Entry */
 typedef struct {
 char username[32];
-int totalSessionScore; /* Total words found across all puzzles played */
+int totalSessionScore; 
 int puzzlesCompleted;
 } PlayerProfile;
 
-static PlayerProfile player; /* Global instance of our player */
+static PlayerProfile player; 
 
-/* File I/O for External Word Bank*/
 #define MAX_BANK_SZ 100
 static char externalBank[MAX_BANK_SZ][MAX_L + 1];
 static int externalBankSz = 0;
@@ -75,8 +62,6 @@ static int externalBankSz = 0;
 static void loadWordBankFromFile(void) {
 FILE *fp = fopen("words.txt", "r");
 
-/* If words.txt is missing, generate a default one automatically 
-   so the game doesn't crash on first run! */
 if (!fp) {
     fp = fopen("words.txt", "w");
     if (fp) {
@@ -85,18 +70,16 @@ if (!fp) {
         fprintf(fp, "STACK\nQUEUE\nGRAPH\nARRAY\nLOOP\nCLASS\nOBJECT\nMODULE\nTHREAD\nPROCESS\n");
         fclose(fp);
     }
-    fp = fopen("words.txt", "r"); /* Re-open for reading */
-    if (!fp) return; /* Failsafe */
+    fp = fopen("words.txt", "r"); 
+    if (!fp) return; 
 }
 
 char buf[128];
 externalBankSz = 0;
 
-/* Read line-by-line using standard File I/O */
-while (fgets(buf, sizeof(buf), fp) && externalBankSz < MAX_BANK_SZ) {
-    buf[strcspn(buf, "\r\n")] = '\0'; /* Strip newline character */
+   while (fgets(buf, sizeof(buf), fp) && externalBankSz < MAX_BANK_SZ) {
+    buf[strcspn(buf, "\r\n")] = '\0'; 
     
-    /* toUpper logic directly here to ensure words are clean */
     for (char *s = buf; *s; s++) *s = toupper((unsigned char)*s);
     
     int len = (int)strlen(buf);
@@ -117,7 +100,6 @@ fclose(fp);
 
 
 }
-
 
 static void toUpper(char *s) {
 for (; *s; s++) *s = toupper((unsigned char)*s);
@@ -193,15 +175,14 @@ fillRandom();
 }
 
 static void pickFromBank(int n) {
-/* Ensure the bank is loaded from the file first */
 if (externalBankSz == 0) loadWordBankFromFile();
 
-/* Failsafe if file was completely empty */
 if (externalBankSz == 0) {
     printf("Error: words.txt is empty!\n");
     exit(1);
 }
-
+   
+/* Part 2 */
 int used[MAX_BANK_SZ];
 memset(used, 0, sizeof used);
 nW = 0;
