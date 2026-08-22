@@ -382,6 +382,7 @@ if (widx >= 0) {
 
 }
 
+/* Part 3 */
 static void doHint(void) {
 int pool[MAX_W], n = 0;
 for (int i = 0; i < nW; i++)
@@ -511,7 +512,8 @@ if (useBank == 2) {
     if (n > MAX_W) n = MAX_W;
     pickFromBank(n);
 }
-
+    
+/* Last Part */
 generatePuzzle();
 
 int showSol = 0;
