@@ -1,0 +1,26 @@
+# System Requirements & Dependencies
+# Project: Interactive Terminal-Based Word Search Puzzle Generator in C
+
+[Compiler]
+- GCC (GNU Compiler Collection) 9.0 or higher recommended.
+- Compatible with Clang and MSVC.
+
+[Operating System]
+- Windows: Fully supported (Utilizes Win32 API <windows.h> for console colors).
+- Linux / macOS: Fully supported (Fallback to standard POSIX clear screen).
+
+[Standard C Libraries Used]
+- <stdio.h>   : Core input/output operations.
+- <stdlib.h>  : Pseudo-random number generation and system commands.
+- <string.h>  : String manipulation, length checking, and memory masking.
+- <time.h>    : Timestamp generation for seeding the RNG.
+- <ctype.h>   : Character case conversion and alphabet validation.
+
+[Build Instructions]
+Windows (CMD/PowerShell):
+gcc main.c -o wordsearch.exe
+.\wordsearch.exe
+
+Linux / macOS (Terminal):
+gcc main.c -o wordsearch
+./wordsearch

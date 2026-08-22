@@ -1,0 +1,48 @@
+Interactive Terminal-Based Word Search Puzzle Generator in CCourse Code & Section: CSE115L.4Project Group No.: Group 03Group Members:Md. Fahad Kamal Lingkon (ID: 261XXXXXXX) — Module: Grid Generation & Algorithmic EngineMember Two Name (ID: 261XXXXXXX) — Module: UI/UX & Console Rendering ArchitectureMember Three Name (ID: 261XXXXXXX) — Module: Search Engine & Gameplay Validation1. Group Contribution TableMember NameStudent IDAssigned Modules / ResponsibilitiesContribution (%)Md. Fahad Kamal Lingkon261XXXXXXXGrid Generation & Algorithmic Engine: Implemented vector mathematics ($DR, DC$), collision detection (canPlace), Monte Carlo randomized placement (tryPlaceWord), and filler letter masking (fillRandom).33.3%Member Two261XXXXXXXUI/UX & Console Rendering Architecture: Developed Win32 terminal color palette mapping (PAL), screen clearing routines, dynamic board rendering (printGrid), and checklist formatting (printWordList).33.3%Member Three261XXXXXXXSearch Engine, Menus & Input Validation: Built the 4-level nested matrix scan (findInGrid), hint candidate pool stack (doHint), string sanitization (fgets, strcspn), and interactive game state loops.33.4%2. ObjectivesProcedural Matrix Generation: Design and construct a dynamic $15 \times 15$ grid capable of embedding vocabulary strings across all 8 cardinal and diagonal directions without hardcoded pathing.Collision-Resistant Placement: Implement mathematical vector models that validate grid boundaries and permit interlocking character intersections while rejecting conflicting letter overwrites.Exhaustive Matrix Traversal: Develop a multidimensional search engine to scan and verify user-spotted words in real time.Defensive Input Handling: Build robust input-sanitization pipelines preventing buffer overflow vulnerabilities, case discrepancies, and stream synchronization issues (stdin pollution).Interactive Terminal Interface: Enhance user engagement through Windows Console API color-coding, contextual hints, and solution reveal mechanics.3. Development Tools & Header Files JustificationIDE & Compiler: Code::Blocks IDE using the GNU GCC Compiler (C99/C11 standard).                        ┌────────────────────────┐
+                        │   Standard Libraries   │
+                        └───────────┬────────────┘
+         ┌──────────────┬───────────┼──────────────┬──────────────┐
+         ▼              ▼           ▼              ▼              ▼
+    <stdio.h>      <stdlib.h>  <string.h>      <time.h>       <ctype.h>
+    (I/O Flow)    (Randomness) (Memory/Text)  (Time Seed)   (Validation)
+Required Header Files & Technical Justification<stdio.h> (Standard Input/Output):Justification: Essential for standard stream operations. Used for formatted console rendering via printf() (grid layout, checklist, status banners) and robust stream reading via fgets(), scanf(), and getchar().<stdlib.h> (Standard Utility Library):Justification: Supplies the pseudo-random generation pipeline (rand(), srand()) required for random coordinate/direction selection and terminal control commands (system("cls") / system("clear")).<string.h> (String & Memory Manipulation):Justification: Provides low-level memory clearing (memset() for zeroing matrix states), string length validation (strlen()), dictionary matching (strcmp()), and memory-safe copying (strncpy()).<time.h> (Time Utilities):Justification: Supplies time(NULL) to retrieve the current Unix timestamp, seeding srand() so that every game session generates a completely unique matrix layout.<ctype.h> (Character Handling):Justification: Used for string normalization via toupper() (ensuring case-insensitive input verification) and custom word sanitization via isalpha() (rejecting numeric or symbolic entries).<windows.h> (Win32 Console API):Justification: Conditionally compiled (#ifdef _WIN32) to acquire terminal output handles (GetStdHandle) and control text attributes (SetConsoleTextAttribute) for vibrant color highlights.4. Technical Writing (Logics, Functions & Structures)4.1 System Architecture & Global State StructuresThe game maintains state using parallel 2D matrices and structured tracking arrays:Cstatic char grid [15][15]; // Holds uppercase letters displayed to the user
+static int  fmask[15][15]; // Mask layer storing color IDs of user-found words
+static int  smask[15][15]; // Mask layer storing underlying placed word IDs (solution map)
+[Insert Screenshot Here: Visual representation of the Grid Layout and Terminal UI]
+Figure 1: Terminal output showing dynamic grid rendering, coordinate headers, and color-coded status.
+4.2 Algorithmic Logic: Grid Generation & Vector MathThe engine models spatial navigation in 2D space using coordinate offset vectors:$$\text{DR}[8] = \{0, 0, 1, -1, 1, 1, -1, -1\}, \quad \text{DC}[8] = \{1, -1, 0, 0, 1, -1, 1, -1\}$$For any character $i$ of word $w$ starting at origin $(r_0, c_0)$ in direction $d$:$$r = r_0 + i \cdot \text{DR}[d], \quad c = c_0 + i \cdot \text{DC}[d]$$[Insert Screenshot Here: Code snippet of canPlace() and tryPlaceWord() functions]
+Figure 2: Source implementation of canPlace() validation and tryPlaceWord() Monte Carlo loop.
+canPlace(): Evaluates proposed vector trajectories. It calls inBounds() to ensure coordinates satisfy $0 \le r < 15$ and $0 \le c < 15$. It checks collision states via:$$\text{if } (\text{grid}[r][c] \ne 0 \text{ and } \text{grid}[r][c] \ne w[i]) \implies \text{Reject (0)}$$tryPlaceWord(): Implements a Monte Carlo trial loop capped at $\text{TRIES} = 1000$. It samples random origins and directions, placing the word via doPlace() upon validation or skipping placement if the grid is saturated.fillRandom(): Iterates over the entire matrix, filling unassigned cells (\0) with pseudo-random uppercase ASCII characters:$$\text{letter} = \text{'A'} + (\text{rand}() \pmod{26})$$4.3 Search Engine & Gameplay Mechanics[Insert Screenshot Here: Code snippet of findInGrid() and doGuessWord() functions]
+Figure 3: Search engine implementation featuring 4-nested matrix traversal.
+findInGrid(): Executes an exhaustive $O(R \cdot C \cdot D \cdot L)$ search. It evaluates all rows $r$, columns $c$, and direction vectors $d$ against target string lengths to locate full or accidental character matches on the board.doGuessWord(): Validates user inputs against target arrays (W) using strcmp(). If valid, it updates fmask via markFoundCells(), increments nFound, and checks the win condition:$$\text{if } (n_{\text{Found}} == n_{\text{Placed}}) \implies \text{Trigger Victory Screen}$$doHint(): Scans tracking arrays for placed but un-found words (wPlaced[i] && !wFound[i]), pushes them into a candidate array pool[], and selects a random index to reveal the starting coordinates and direction.4.4 Defensive Input Validation & Buffer SanitizationTo prevent crashes from user input errors, the input pipeline utilizes:fgets() & strcspn(): Prevents buffer overflow by restricting reads to buffer capacities and strips trailing newline characters:Cbuf[strcspn(buf, "\r\n")] = '\0';
+flushInput(): Clears residual newline bytes from stdin following scanf() calls:Cstatic void flushInput(void) {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
+4.5 Execution Workflow Summary                      ┌────────────────────────┐
+                      │      main() Entry      │
+                      └───────────┬────────────┘
+                                  ▼
+                      ┌────────────────────────┐
+                      │ Word Source Selection  │
+                      │ (Bank vs Custom Words) │
+                      └───────────┬────────────┘
+                                  ▼
+                      ┌────────────────────────┐
+                      │    generatePuzzle()    │
+                      │  (Placement & Noise)   │
+                      └───────────┬────────────┘
+                                  ▼
+                      ┌────────────────────────┐
+                 ┌───►│   Interactive Loop     │◄───┐
+                 │    │  (printGrid, Actions)  │    │
+                 │    └───────────┬────────────┘    │
+                 │                ▼                 │
+                 │      [1] Guess Word ─────────────┤
+                 │      [2] Reveal Solution ────────┤
+                 │      [3] Get Hint ───────────────┤
+                 │      [4/5] Regenerate ───────────┘
+                 │                │
+                 │         [0] Quit Choice
+                 │                ▼
+                 └─────── [Exit Program (0)]

@@ -1,0 +1,19 @@
+# PLAYER PROFILE DATA / LEADERBOARD PLACEHOLDER
+# This file outlines the schema for the PlayerProfile struct used in the program.
+# Can be utilized for persistent data saving (fwrite/fprintf) in future updates.
+
+[Schema]
+Username | TotalSessionScore | PuzzlesCompleted
+
+[Example Records]
+Fahad       | 42 | 5
+Guest       | 15 | 2
+PlayerOne   | 8  | 0
+Admin       | 64 | 8
+
+[Internal Struct Reference]
+typedef struct {
+    char username[32];
+    int totalSessionScore;
+    int puzzlesCompleted;
+} PlayerProfile;

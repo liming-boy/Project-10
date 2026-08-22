@@ -1,0 +1,32 @@
+======================================================
+WORD SEARCH PUZZLE GENERATOR - SUPPORT & DOCUMENTATION
+======================================================
+
+[Game Overview]
+A procedural 15x15 terminal-based word search. Words are hidden across 
+8 distinct directions (Horizontal, Vertical, and Diagonals). Words can 
+interlock and share characters.
+
+[How to Play]
+1. Launch the executable.
+2. Enter your Player Name to initialize your Player Profile.
+3. Choose your word bank (Load from words.txt OR type your own).
+4. Select the number of words to hide.
+5. Use the Action Menu to navigate the game loop.
+
+[Controls & Actions]
+[1] Guess a word : Type a word you found. If correct, it highlights green.
+[2] Reveal       : Temporarily reveals all hidden words in yellow.
+[3] Hint         : Provides the starting row, column, and direction of a word.
+[4] Regenerate   : Keeps your current words but generates a completely new grid.
+[5] New puzzle   : Restarts the setup phase for new words.
+[0] Quit         : Ends the session and prints your total score profile.
+
+[Troubleshooting]
+- Missing File Error: If 'words.txt' is deleted, the C engine will automatically 
+  re-create it with a default tech-word dataset upon launch.
+- Formatting Issues: If the grid looks misaligned, ensure your terminal font 
+  is set to a Monospace font (like Consolas or Courier New).
+- IDE Terminals: For the best experience, run the compiled program in a native 
+  terminal (Windows Terminal, CMD, bash) rather than an IDE's integrated output 
+  tab to allow screen clearing (system("cls")) to function smoothly.
